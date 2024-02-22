@@ -76,7 +76,7 @@ async function startCorrection(
         config,
     );
     const statusEndpoint = result.data.statusEndpoint;
-    console.log(`Image corrected started. Status endpoint: ${statusEndpoint}`);
+    console.log(statusEndpoint);
 
     return { statusEndpoint };
 }

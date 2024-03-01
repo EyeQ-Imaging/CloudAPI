@@ -1,57 +1,59 @@
 # Perfectly Clear API Bash Usage Example
 
-This script automates the process of enhancing images using the Perfectly Clear API. It downloads an image from a given URL, uploads it to the Perfectly Clear service, applies predefined correction parameters, and then downloads the enhanced image.
+This script automates the process of enhancing images using the Perfectly Clear API. It uploads local file to the Perfectly Clear service, applies predefined correction parameters, and then downloads the enhanced image.
 
 ## Requirements
 
-•   `cURL`: This script uses curl for HTTP requests.
+•   `cURL`: Used for making HTTP requests.
 
-•   `jq`: JSON parsing is done through jq. Please ensure it's installed on your system.
+•   `jq`: Needed for JSON parsing.
+
+•   `.env`: A file storing environment variables including the API key.
+
+## Setup
+
+1.  Update .env file with your Perfectly Clear API key (APIKEY)
+2.  Ensure you have cURL and jq installed on your system.
+3.  Make the script executable by running `./app.sh`
 
 ## Usage
 
-1.  Set up the `APIKEY` with your Perfectly Clear API key.
-2.  Configure the `INPUT_URL` variable with the URL of the image you want to correct.
-3.  Run the script by executing `./app.sh`
+Run the script with the following syntax:
 
-## Environmental Variables
+``
+./perfectly_clear.sh INPUT_FILE OUTPUT_FILE [CORRECTION_PARAMETERS]
+``
 
-•  `DOMAIN`: The endpoint domain for the Perfectly Clear API.
+•   `INPUT_FILE`: The path to the local image file to be processed.
 
-•  `APIKEY`: Your personal API key for accessing the Perfectly Clear API.
+•   `OUTPUT_FILE`: The path where the enhanced image will be saved.
 
-•  `INPUT_URL`: The URL of the image that you wish to process.
+•   `[CORRECTION_PARAMETERS]` (optional): Additional parameters for image correction.
 
-•  `INPUT_FILE`: Local path where the input image will be saved.
+Example: 
 
-•  `OUTPUT_FILE`: Local path where the enhanced image will be saved.
-
-## Optional Configuration
-
-•   `FILE_TYPE`: The type of file being processed (default is 'image').
-
-•   `CORRECTION_PARAMETERS`: Correction parameters for the image enhancement.
+``
+./perfectly_clear.sh input.jpg output.jpg preset=Universal
+``
 
 ## Functions
 
-•   `downloadFile` downloads the image from the specified URL.
+•   `downloadFile`: Downloads the image from the specified URL.
 
-•   `getPreSignedURL` retrieves the pre-signed URL for uploading the image.
+•   `getPreSignedURL`: Retrieves the pre-signed URL for uploading the image.
 
-•   `uploadFile` uploads the image to the Perfectly Clear storage.
+•   `uploadFile`: Uploads the image to the Perfectly Clear storage.
 
-•   `startCorrection` starts the image correction process with Perfectly Clear.
+•   `startCorrection`: Initiates the image correction process.
 
-•   `statusUpdate` repeatedly checks the status of the correction until it's completed.
+•   `statusUpdate`: Checks the status of the correction until completion.
 
 ## Output
 
-The script will save two images:
-
-•   The original image from the `INPUT_URL`.
-
-•   The enhanced image after correction by Perfectly Clear API.
+The script saves the enhanced image at the `OUTPUT_FILE` path after processing.
 
 ## Notes
 
-•   Ensure that the `APIKEY` is kept secret and not exposed publicly.
+•   Keep the API key confidential and avoid exposing it publicly.
+
+•   Ensure the `.env` file is properly formatted and stored securely.

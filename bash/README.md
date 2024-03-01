@@ -21,7 +21,7 @@ This script automates the process of enhancing images using the Perfectly Clear 
 Run the script with the following syntax:
 
 ``
-./script.sh INPUT_FILE OUTPUT_FILE [CORRECTION_PARAMETERS]
+./perfectly_clear.sh INPUT_FILE OUTPUT_FILE [CORRECTION_PARAMETERS]
 ``
 
 •   `INPUT_FILE`: The path to the local image file to be processed.
@@ -33,7 +33,7 @@ Run the script with the following syntax:
 Example: 
 
 ``
-./script.sh input.jpg output.jpg preset=Universal
+./perfectly_clear.sh input.jpg output.jpg preset=Universal
 ``
 
 ## Functions

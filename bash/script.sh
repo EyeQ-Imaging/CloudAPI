@@ -1,8 +1,8 @@
 #!/bin/bash
 
-set -a # automatically export all variables
+set -a
 source .env
-set +a # stop automatically exporting
+set +a
 
 # Check if the APIKEY is empty
 if [ -z "$APIKEY" ]; then
@@ -24,7 +24,7 @@ OUTPUT_FILE=$2
 if [ "$#" -ge 3 ]; then
     CORRECTION_PARAMETERS=$3
 else
-    CORRECTION_PARAMETERS="default_value" # Replace this with any default value you want
+    CORRECTION_PARAMETERS=""
 fi
 
 echo "Input file path: $INPUT_FILE"
@@ -38,7 +38,7 @@ function downloadFile {
     local url=$1
     local filePath=$2
     curl -L -s -o "$filePath" "$url"
-    echo "Image from $url saved to $filePath"
+    echo "Image saved to $filePath"
 }
 
 function getPreSignedURL {
@@ -67,10 +67,19 @@ function startCorrection {
 function statusUpdate {
     local statusEndpoint=$1
     local status=''
-    while [ "$status" != "COMPLETED" ]; do
+    while : ; do
         local result=$(curl -s "$statusEndpoint?noRedirect=true")
         status=$(echo $result | jq -r '.status')
         echo "Current correction status is: $status"
+
+        if [[ "$status" == "COMPLETED" ]]; then
+            break
+        elif [[ "$status" == "REJECTED" || "$status" == "FAILED" ]]; then
+            local statusText=$(echo $result | jq -r '.statusText')
+            echo "Process $status with reason: $statusText"
+            exit 1
+        fi
+
         sleep 1
     done
 }

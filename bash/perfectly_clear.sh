@@ -10,6 +10,14 @@ if [ -z "$APIKEY" ]; then
     exit 1
 fi
 
+# Check if the APIKEY is empty
+if [ -z "$APIENDPOINT" ]; then
+    APIENDPOINT='https://api.perfectlyclear.io/v2'
+    echo "Using standard APIENDPOINT: $APIENDPOINT"
+else
+    echo "Using custom APIENDPOINT:   $APIENDPOINT"
+fi
+
 # Check if at least two arguments are provided
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 INPUT_FILE OUTPUT_FILE [CORRECTION_PARAMETERS]"
@@ -34,11 +42,9 @@ else
     CORRECTION_PARAMETERS=""
 fi
 
-echo "Input file path: $INPUT_FILE"
-echo "Output file path: $OUTPUT_FILE"
+echo "Input file path:            $INPUT_FILE"
+echo "Output file path:           $OUTPUT_FILE"
 echo "Correction parameters: $CORRECTION_PARAMETERS"
-
-APIENDPOINT='https://api.perfectlyclear.io/v2'
 
 function downloadFile {
     local url=$1

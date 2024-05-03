@@ -10,6 +10,14 @@ if [ -z "$APIKEY" ]; then
     exit 1
 fi
 
+# Check if the APIKEY is empty
+if [ -z "$APIENDPOINT" ]; then
+    APIENDPOINT='https://api.perfectlyclear.io/v2'
+    echo "Using standard APIENDPOINT: $APIENDPOINT"
+else
+    echo "Using custom APIENDPOINT:   $APIENDPOINT"
+fi
+
 # Check if at least two arguments are provided
 if [ "$#" -lt 2 ]; then
     echo "Usage: $0 INPUT_FILE OUTPUT_FILE [CORRECTION_PARAMETERS]"
@@ -19,6 +27,13 @@ fi
 # Assign the first argument to INPUT_FILE and the second to OUTPUT_FILE
 INPUT_FILE=$1
 OUTPUT_FILE=$2
+NEEDS_UPLOAD=true
+
+#test if INPUT_FILE exists
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Input file doesn't exist, so assuming this is a valid fileKey"
+    NEEDS_UPLOAD=false
+fi
 
 # Check for the optional third argument
 if [ "$#" -ge 3 ]; then
@@ -27,12 +42,9 @@ else
     CORRECTION_PARAMETERS=""
 fi
 
-echo "Input file path: $INPUT_FILE"
-echo "Output file path: $OUTPUT_FILE"
+echo "Input file path:            $INPUT_FILE"
+echo "Output file path:           $OUTPUT_FILE"
 echo "Correction parameters: $CORRECTION_PARAMETERS"
-
-DOMAIN='https://api.perfectlyclear.io'
-FILE_TYPE='image'
 
 function downloadFile {
     local url=$1
@@ -42,7 +54,7 @@ function downloadFile {
 }
 
 function getPreSignedURL {
-    local output=$(curl -s -H "X-API-KEY: $APIKEY" "$DOMAIN/v2/upload")
+    local output=$(curl -s -H "X-API-KEY: $APIKEY" "$APIENDPOINT/upload")
     local fileKey=$(echo $output | jq -r '.fileKey')
     local uploadUrl=$(echo $output | jq -r '.upload_url')
     echo "Pre-signed URL received from Perfectly Clear API"
@@ -59,7 +71,7 @@ function uploadFile {
 
 function startCorrection {
     local fileKey=$1
-    local result=$(curl -s -H "X-API-KEY: $APIKEY" "$DOMAIN/v2/pfc?fileType=$FILE_TYPE&fileKey=$fileKey&$CORRECTION_PARAMETERS")
+    local result=$(curl -s -H "X-API-KEY: $APIKEY" "$APIENDPOINT/pfc?&fileKey=$fileKey&$CORRECTION_PARAMETERS")
     local statusEndpoint=$(echo $result | jq -r '.statusEndpoint')
     echo $statusEndpoint
 }
@@ -85,14 +97,20 @@ function statusUpdate {
 }
 
 # Main execution flow
-IFS=$'\n' read -d '' -r -a pre_signed_info < <(getPreSignedURL && printf '\0')
-fileKey=${pre_signed_info[1]}
-uploadUrl=${pre_signed_info[2]}
+if [ "$NEEDS_UPLOAD" = true ]; then
+    IFS=$'\n' read -d '' -r -a pre_signed_info < <(getPreSignedURL && printf '\0')
+    fileKey=${pre_signed_info[1]}
+    uploadUrl=${pre_signed_info[2]}
 
-uploadFile "$INPUT_FILE" "$uploadUrl"
+    uploadFile "$INPUT_FILE" "$uploadUrl"
+else
+    echo "skipping upload"
+    fileKey=$INPUT_FILE
+fi
 
+echo "Starting correction process for $fileKey"
 status_endpoint=$(startCorrection "$fileKey")
-echo $status_endpoint
+echo "Status endpoint: $status_endpoint"
 statusUpdate "$status_endpoint"
 
 downloadFile "$status_endpoint" "$OUTPUT_FILE"

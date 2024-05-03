@@ -73,6 +73,11 @@ function startCorrection {
     local fileKey=$1
     local result=$(curl -s -H "X-API-KEY: $APIKEY" "$APIENDPOINT/pfc?&fileKey=$fileKey&$CORRECTION_PARAMETERS")
     local statusEndpoint=$(echo $result | jq -r '.statusEndpoint')
+    #if statusEndpoint is null, then return the result
+    if [ "$statusEndpoint" == "null" ]; then
+        echo $result
+        exit 1
+    fi
     echo $statusEndpoint
 }
 
@@ -110,6 +115,12 @@ fi
 
 echo "Starting correction process for $fileKey"
 status_endpoint=$(startCorrection "$fileKey")
+#if status_endpoint doesn't start with http, then it's an error message
+if [[ ! "$status_endpoint" =~ ^http ]]; then
+    echo "Error: $status_endpoint"
+    exit 1
+fi
+
 echo "Status endpoint: $status_endpoint"
 statusUpdate "$status_endpoint"
 

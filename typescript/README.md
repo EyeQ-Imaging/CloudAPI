@@ -23,7 +23,7 @@ yarn
 3.  Run the script with Node.js:
 
 ``
-ts-node src/app.ts
+npx ts-node src/app.ts
 ``
 
 The script performs the following steps:

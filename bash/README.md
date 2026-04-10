@@ -1,6 +1,6 @@
-# Perfectly Clear API Bash Usage Example
+# Perfectly Clear API Bash Examples
 
-This script automates the process of enhancing images using the Perfectly Clear API. It uploads local file to the Perfectly Clear service, applies predefined correction parameters, and then downloads the enhanced image.
+Bash scripts for interacting with the Perfectly Clear API. Includes image correction and user preset management.
 
 ## Requirements
 
@@ -12,45 +12,76 @@ This script automates the process of enhancing images using the Perfectly Clear 
 
 ## Setup
 
-1.  Update .env file with your Perfectly Clear API key (APIKEY)
-2.  Ensure you have cURL and jq installed on your system.
-3.  Make the script executable by running `./app.sh`
+1.  Update `.env` with your Perfectly Clear API key (`APIKEY`) and optionally a custom endpoint (`APIENDPOINT`).
+2.  Ensure you have `cURL` and `jq` installed on your system.
 
-## Usage
+## Image Correction
 
-Run the script with the following syntax:
+`perfectly_clear.sh` uploads an image, applies correction parameters, and downloads the result.
 
-``
+```
 ./perfectly_clear.sh INPUT_FILE OUTPUT_FILE [CORRECTION_PARAMETERS]
-``
+```
 
-•   `INPUT_FILE`: The path to the local image file to be processed.
+•   `INPUT_FILE`: Path to the local image file, or a previously uploaded fileKey.
 
-•   `OUTPUT_FILE`: The path where the enhanced image will be saved.
+•   `OUTPUT_FILE`: Path where the enhanced image will be saved.
 
-•   `[CORRECTION_PARAMETERS]` (optional): Additional parameters for image correction.
+•   `CORRECTION_PARAMETERS` (optional): Additional parameters for image correction.
 
-Example: 
+Example:
 
-``
+```
 ./perfectly_clear.sh input.jpg output.jpg preset=Universal
-``
+```
 
-## Functions
+## Preset Management
 
-•   `downloadFile`: Downloads the image from the specified URL.
+`preset_manager.sh` manages user presets on the Perfectly Clear API.
 
-•   `getPreSignedURL`: Retrieves the pre-signed URL for uploading the image.
+```
+./preset_manager.sh <command> [options]
+```
 
-•   `uploadFile`: Uploads the image to the Perfectly Clear storage.
+### Commands
 
-•   `startCorrection`: Initiates the image correction process.
+**List all presets:**
 
-•   `statusUpdate`: Checks the status of the correction until completion.
+```
+./preset_manager.sh list
+```
 
-## Output
+**Get metadata for a preset:**
 
-The script saves the enhanced image at the `OUTPUT_FILE` path after processing.
+```
+./preset_manager.sh get -p <presetId>
+```
+
+**Download a preset file:**
+
+```
+./preset_manager.sh download -p <presetId> [-o <output_file>]
+```
+
+If `-o` is omitted, the file is saved as `<presetId>.preset`.
+
+**Upload a new preset:**
+
+```
+./preset_manager.sh upload -n <name> -d <description> -f <file>
+```
+
+**Delete a preset:**
+
+```
+./preset_manager.sh delete -p <presetId>
+```
+
+### Options
+
+•   `-k <apikey>`: Override the API key from `.env` for a single command.
+
+•   `-h`: Show help.
 
 ## Notes
 
